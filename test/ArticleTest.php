@@ -15,7 +15,7 @@ class ArticleTest extends TestCase
 
     public function setUp(): void
     {
-        $this->article = New App\Article;
+        $this->article = new App\Article();
     }
 
     public function testTitleIsEmptyByDefault()
@@ -61,13 +61,13 @@ class ArticleTest extends TestCase
     {
         return [
             'Space In the Title Is Replaced By Underscore In Slug'
-                => ["this title has spaces", "this_title_has_spaces"],
+            => ["this title has spaces", "this_title_has_spaces"],
             'Slug Has White Space Replaced By Single Underscore'
-                => ["this   title   has   \n  spaces", "this_title_has_spaces"],
+            => ["this   title   has   \n  spaces", "this_title_has_spaces"],
             'Slug Does Not Start Or End With An Underscore'
-                => ["    this   title   has   \n  spaces  ", "this_title_has_spaces"],
+            => ["    this   title   has   \n  spaces  ", "this_title_has_spaces"],
             'Slug Does Not Have Any Non Word Characters'
-                => ["Read! This! Now!", 'Read_This_Now']
+            => ["Read! This! Now!", 'Read_This_Now']
         ];
     }
 
@@ -79,5 +79,57 @@ class ArticleTest extends TestCase
         $this->article->title = $title;
 
         $this->assertEquals($this->article->getSlug(), $slug);
+    }
+
+    public function testGetDescriptionDoesNotReturnEmptyvalue()
+    {
+        $this->assertNotEmpty($this->article->getDescription());
+    }
+
+    public function testGetIdIsInt()
+    {
+        $articleChild = new \App\ArticleChild();
+
+        $this->assertIsInt($articleChild->getID());
+    }
+
+    public function testGetTokenIsString()
+    {
+        $reflector = new ReflectionClass($this->article);
+
+        $method = $reflector->getMethod('getToken');
+
+        $method->setAccessible(true);
+
+        $result = $method->invoke($this->article);
+
+        $this->assertIsString($result);
+    }
+
+    public function testGetPrefixTokenIsString()
+    {
+        $reflector = new ReflectionClass($this->article);
+
+        $method = $reflector->getMethod('getPrefixedToken');
+
+        $method->setAccessible(true);
+
+        $result = $method->invokeArgs($this->article, ['example']);
+
+        $this->assertStringStartsWith('example', $result);
+
+    }
+
+    public function TestIDIsAnInteger()
+    {
+        $reflector = new ReflectionClass($this->article);
+
+        $property = $reflector->getProperty('article_id');
+
+        $property->setAccessible(true);
+
+        $value = $property->getValue($this->article);
+
+        $this->assertIsInt($value);
     }
 }
